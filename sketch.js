@@ -16,9 +16,9 @@ let selectedImage;
 let selectedDetailsGraphic;
 
 function preload() {
-  map.img = loadImage("assets/GTmap.png");
+  map.img = loadImage("./assets/GTmap.png");
 
-  fetch('/assets/data.json')
+  fetch('./assets/data.json')
     .then(response => response.json()) // Parse JSON
     .then(data => {
       for (let i = 0; i < data.length; i++) {
@@ -161,7 +161,7 @@ function setupMap() {
 
 class Art {
   constructor(file, type, location, x, y) {
-    this.path = "/assets/images/" + file;
+    this.path = "./assets/images/" + file;
     this.type = type;
     this.location = location;
     this.x = x;
