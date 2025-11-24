@@ -15,6 +15,12 @@ let selectedArt;
 let selectedImage;
 let selectedDetailsGraphic;
 
+let filterGraphic;
+let typeFilterNames = ["Poster", "Drawing", "Painting", "Sticker"];
+let typeFilter = [true, true, true, true];
+let surfaceFilterNames = ["Post", "Wall", "Door", "Ground"];
+let surfaceFilter = [true, true, true, true];
+
 function preload() {
   map.img = loadImage("./assets/GTmap.png");
 
@@ -33,29 +39,16 @@ function setup() {
 
   setupMap();
   selectedDetailsGraphic = createGraphics(windowWidth * 0.4, windowHeight * 0.5);
+  filterGraphic = createGraphics(windowWidth * 0.4, windowHeight * 0.5);
 
   selectedArt = artList[0];
   selectedImage = loadImage(artList[0].path);
 }
 
 function draw() {
-  background(0, 255, 0);
   drawMap();
-
-  selectedDetailsGraphic.background(255, 0, 0);
-
-  if (typeof selectedImage !== "undefined") {
-    if (selectedImage.width > selectedImage.height) {
-      selectedDetailsGraphic.image(selectedImage, 0, 0, windowWidth * 0.2, selectedImage.height / (selectedImage.width / (windowWidth * 0.2)));
-    } else {
-      selectedDetailsGraphic.image(selectedImage, 0, 0, selectedImage.width / (selectedImage.height / (windowHeight * 0.5)), windowHeight * 0.5);
-    }
-  }
-
-  selectedDetailsGraphic.text("TYPE: " + selectedArt.type + "\nSURFACE: " + selectedArt.location, selectedDetailsGraphic.width * 0.5, selectedDetailsGraphic.height * 0.05);
-
-
-  image(selectedDetailsGraphic, window.width * 0.6, 0);
+  drawDetails();
+  drawFilter();
 }
 
 function mousePressed() {
@@ -90,12 +83,28 @@ function mouseWheel(event) {
 }
 
 function mouseClicked() {
-  let hit = selectionCheck();
+  if (mouseX < window.width * 0.6) {
+    let hit = selectionCheck();
 
-  if (typeof hit !== "undefined" && selectedArt != hit) {
-    console.log(hit);
-    selectedArt = hit;
-    selectedImage = loadImage(hit.path);
+    if (typeof hit !== "undefined" && selectedArt != hit) {
+      console.log(hit);
+      selectedArt = hit;
+      selectedImage = loadImage(hit.path);
+    }
+  } else {
+    for (let i = 0; i < 4; i++) {
+      if (inBounds(mouseX, mouseY, window.width * 0.6 + filterGraphic.width * 0.05, window.height * 0.5 + filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1)) {
+        typeFilter[i] = !typeFilter[i];
+        console.log("boop");
+      }
+    }
+
+    for (let i = 0; i < 4; i++) {
+      if (inBounds(mouseX, mouseY, window.width * 0.6 + filterGraphic.width * 0.55, window.height * 0.5 + filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1)) {
+        surfaceFilter[i] = !surfaceFilter[i];
+        console.log("bop");
+      }
+    }
   }
 }
 
@@ -125,11 +134,41 @@ function drawMap() {
   for (let i = 0; i < artList.length; i++) {
     let a = artList[i];
 
+    switch (a.type) {
+      case "poster":
+        if (!typeFilter[0]) continue;
+        break;
+      case "drawing":
+        if (!typeFilter[1]) continue;
+        break;
+      case "painting":
+        if (!typeFilter[2]) continue;
+        break;
+      case "sticker":
+        if (!typeFilter[3]) continue;
+        break;
+    }
+    
+    switch (a.surface) {
+      case "post":
+        if (!surfaceFilter[0]) continue;
+        break;
+      case "wall":
+        if (!surfaceFilter[1]) continue;
+        break;
+      case "door":
+        if (!surfaceFilter[2]) continue;
+        break;
+      case "ground":
+        if (!surfaceFilter[3]) continue;
+        break;
+    }
+
     if (selectedArt == a) {
       map.graphic.strokeWeight(1);
       map.graphic.stroke(170);
       map.graphic.fill(255);
-      map.graphic.circle((a.x - map.pos.x / map.scl) * map.scl , (a.y - map.pos.y / map.scl) * map.scl, 18);
+      map.graphic.circle((a.x - map.pos.x / map.scl) * map.scl , (a.y - map.pos.y / map.scl) * map.scl, 20);
       map.graphic.strokeWeight(2);
       map.graphic.stroke(155, 0, 0);
       map.graphic.fill(255, 0, 0);
@@ -159,11 +198,58 @@ function setupMap() {
   map.pos = createVector(-190, 0);
 }
 
+function drawDetails() {
+  selectedDetailsGraphic.background(220);
+
+  if (typeof selectedImage !== "undefined") {
+    if (selectedImage.width > selectedImage.height) {
+      selectedDetailsGraphic.image(selectedImage, 0, 0, windowWidth * 0.2, selectedImage.height / (selectedImage.width / (windowWidth * 0.2)));
+    } else {
+      selectedDetailsGraphic.image(selectedImage, 0, 0, selectedImage.width / (selectedImage.height / (windowHeight * 0.5)), windowHeight * 0.5);
+    }
+  }
+
+  selectedDetailsGraphic.text("TYPE: " + selectedArt.type + "\nSURFACE: " + selectedArt.surface, selectedDetailsGraphic.width * 0.65, selectedDetailsGraphic.height * 0.45);
+
+  image(selectedDetailsGraphic, window.width * 0.6, 0);
+}
+
+function drawFilter() {
+  filterGraphic.background(200);
+
+  filterGraphic.text("TYPE", filterGraphic.width * 0.05, filterGraphic.height * 0.075);
+  filterGraphic.text("SURFACE", filterGraphic.width * 0.55, filterGraphic.height * 0.075);
+
+  for (let i = 0; i < 4; i++) {
+    if (typeFilter[i]) filterGraphic.fill(255);
+    else filterGraphic.fill(150);
+    filterGraphic.rect(filterGraphic.width * 0.05, filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
+    filterGraphic.fill(0);
+    filterGraphic.text(typeFilterNames[i], filterGraphic.width * 0.065, filterGraphic.height * 0.05 * (4.15 + 4 * i))
+  }
+
+  for (let i = 0; i < 4; i++) {
+    if (surfaceFilter[i]) filterGraphic.fill(255);
+    else filterGraphic.fill(150);
+    filterGraphic.rect(filterGraphic.width * 0.55, filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
+    filterGraphic.fill(0);
+    filterGraphic.text(surfaceFilterNames[i], filterGraphic.width * 0.565, filterGraphic.height * 0.05 * (4.15 + 4 * i))
+  }
+
+
+  image(filterGraphic, window.width * 0.6, window.height * 0.5);
+}
+
+function inBounds(px, py, x, y, w, h) {
+  console.log("beep");
+  return px >= x && px <= x + w && py >= y && py <= y + h;
+}
+
 class Art {
-  constructor(file, type, location, x, y) {
+  constructor(file, type, surface, x, y) {
     this.path = "./assets/images/" + file;
     this.type = type;
-    this.location = location;
+    this.surface = surface;
     this.x = x;
     this.y = y;
   }
