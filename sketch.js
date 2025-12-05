@@ -61,7 +61,7 @@ function draw() {
 
   if (showVis) {
     image(vis, 0, 0, window.width, window.height);
-    fill(255);
+    fill(247, 243, 229);
     circle(window.width * 0.95, window.height * 0.07, window.width * 0.04);
     stroke(42);
     strokeWeight(window.width * 0.004);
@@ -242,7 +242,7 @@ function drawDetails() {
   }
 
   selectedDetailsGraphic.textFont(font);
-  selectedDetailsGraphic.fill(255);
+  selectedDetailsGraphic.fill(247, 243, 229);
   selectedDetailsGraphic.textSize(selectedDetailsGraphic.width * 0.02);
   selectedDetailsGraphic.text("TYPE:  " + selectedArt.type + "\nSURFACE:  " + selectedArt.surface, selectedDetailsGraphic.width * 0.6, selectedDetailsGraphic.height * 0.45);
 
@@ -253,7 +253,7 @@ function drawFilter() {
   filterGraphic.background(42);
 
   filterGraphic.textFont(font);
-  filterGraphic.fill(255);
+  filterGraphic.fill(247, 243, 229);
   filterGraphic.textSize(filterGraphic.width * 0.02);
   filterGraphic.text("TYPE", filterGraphic.width * 0.05, filterGraphic.height * 0.075);
   filterGraphic.text("SURFACE", filterGraphic.width * 0.55, filterGraphic.height * 0.075);
@@ -263,7 +263,7 @@ function drawFilter() {
     if (typeFilter[i]) filterGraphic.fill(43, 120, 192);
     else filterGraphic.fill(110);
     filterGraphic.rect(filterGraphic.width * 0.05, filterGraphic.height * 0.04   * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
-    filterGraphic.fill(255);
+    filterGraphic.fill(247, 243, 229);
     filterGraphic.text(typeFilterNames[i], filterGraphic.width * 0.065, filterGraphic.height * 0.04 * (4.5 + 4 * i))
   }
 
@@ -271,13 +271,13 @@ function drawFilter() {
     if (surfaceFilter[i]) filterGraphic.fill(43, 120, 192);
     else filterGraphic.fill(110);
     filterGraphic.rect(filterGraphic.width * 0.55, filterGraphic.height * 0.04 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
-    filterGraphic.fill(255);
+    filterGraphic.fill(247, 243, 229);
     filterGraphic.text(surfaceFilterNames[i], filterGraphic.width * 0.565, filterGraphic.height * 0.04 * (4.5 + 4 * i))
   }
 
   filterGraphic.fill(138, 113, 165);
   filterGraphic.rect(filterGraphic.width * 0.05, filterGraphic.height * 0.84, filterGraphic.width * 0.9, filterGraphic.height * 0.1);
-  filterGraphic.fill(255);
+  filterGraphic.fill(247, 243, 229);
   filterGraphic.text("See Student Opinions", filterGraphic.width * 0.38, filterGraphic.height * 0.9);
 
   image(filterGraphic, window.width * 0.6, window.height * 0.5);
