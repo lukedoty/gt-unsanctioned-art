@@ -39,7 +39,7 @@ function preload() {
     }); // Work with JSON data
 
     font = loadFont("./assets/OpenSans-SemiBold.ttf");
-    vis = loadImage("./assets/UpdatedVisualization.png");
+    vis = loadImage("./assets/Vis3.png");
 }
 
 function setup() {
