@@ -21,6 +21,11 @@ let typeFilter = [true, true, true, true];
 let surfaceFilterNames = ["Post", "Wall", "Door", "Ground"];
 let surfaceFilter = [true, true, true, true];
 
+let font;
+
+let vis;
+let showVis = false;
+
 function preload() {
   map.img = loadImage("./assets/GTmap.png");
 
@@ -32,6 +37,9 @@ function preload() {
         artList.push(new Art(d.file, d.type, d.location, d.posX, d.posY));
       }
     }); // Work with JSON data
+
+    font = loadFont("./assets/OpenSans-SemiBold.ttf");
+    vis = loadImage("./assets/UpdatedVisualization.png");
 }
 
 function setup() {
@@ -43,21 +51,36 @@ function setup() {
 
   selectedArt = artList[0];
   selectedImage = loadImage(artList[0].path);
+  textFont(font);
 }
 
 function draw() {
   drawMap();
   drawDetails();
   drawFilter();
+
+  if (showVis) {
+    image(vis, 0, 0, window.width, window.height);
+    fill(255);
+    circle(window.width * 0.95, window.height * 0.07, window.width * 0.04);
+    stroke(42);
+    strokeWeight(window.width * 0.004);
+    line(window.width * 0.95 - window.width * 0.008, window.height * 0.07 - window.width * 0.008, window.width * 0.95 + window.width * 0.008, window.height * 0.07 + window.width * 0.008);
+    line(window.width * 0.95 + window.width * 0.008, window.height * 0.07 - window.width * 0.008, window.width * 0.95 - window.width * 0.008, window.height * 0.07 + window.width * 0.008);
+  }
 }
 
 function mousePressed() {
+  if (showVis) return;
+ 
   if (mouseX > windowWidth * 0.6) return;
   mouseDragOrigin = createVector(mouseX, mouseY);
   mapDragOrigin = createVector(map.pos.x, map.pos.y);
 }
 
 function mouseDragged() {
+  if (showVis) return;
+
   if (mouseX > windowWidth * 0.6) return;
   if (typeof mouseDragOrigin === "undefined") {
     mouseDragOrigin = createVector(mouseX, mouseY);
@@ -83,6 +106,11 @@ function mouseWheel(event) {
 }
 
 function mouseClicked() {
+  if (showVis) {
+    if (abs(mouseX - window.width * 0.95) <= window.width * 0.05 && abs(mouseY - window.width * 0.04) <= window.width * 0.05) showVis = false;
+    return;
+  }
+
   if (mouseX < window.width * 0.6) {
     let hit = selectionCheck();
 
@@ -93,17 +121,21 @@ function mouseClicked() {
     }
   } else {
     for (let i = 0; i < 4; i++) {
-      if (inBounds(mouseX, mouseY, window.width * 0.6 + filterGraphic.width * 0.05, window.height * 0.5 + filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1)) {
+      if (inBounds(mouseX, mouseY, window.width * 0.6 + filterGraphic.width * 0.05, window.height * 0.5 + filterGraphic.height * 0.04 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1)) {
         typeFilter[i] = !typeFilter[i];
         console.log("boop");
       }
     }
 
     for (let i = 0; i < 4; i++) {
-      if (inBounds(mouseX, mouseY, window.width * 0.6 + filterGraphic.width * 0.55, window.height * 0.5 + filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1)) {
+      if (inBounds(mouseX, mouseY, window.width * 0.6 + filterGraphic.width * 0.55, window.height * 0.5 + filterGraphic.height * 0.04 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1)) {
         surfaceFilter[i] = !surfaceFilter[i];
         console.log("bop");
       }
+    }
+
+    if (inBounds(mouseX, mouseY, window.width * 0.6 + filterGraphic.width * 0.05, window.height * 0.5 + filterGraphic.height * 0.84, filterGraphic.width * 0.9, filterGraphic.height * 0.1)) {
+      showVis = true;
     }
   }
 }
@@ -194,12 +226,12 @@ function setupMap() {
   map.gSize = createVector(windowWidth * 0.6, windowHeight);
   map.graphic = createGraphics(map.gSize.x, map.gSize.y);
 
-  map.scl = 0.1;
-  map.pos = createVector(-190, 0);
+  map.scl = 0.4;
+  map.pos = createVector(350, 300);
 }
 
 function drawDetails() {
-  selectedDetailsGraphic.background(220);
+  selectedDetailsGraphic.background(42);
 
   if (typeof selectedImage !== "undefined") {
     if (selectedImage.width > selectedImage.height) {
@@ -209,33 +241,44 @@ function drawDetails() {
     }
   }
 
-  selectedDetailsGraphic.text("TYPE: " + selectedArt.type + "\nSURFACE: " + selectedArt.surface, selectedDetailsGraphic.width * 0.65, selectedDetailsGraphic.height * 0.45);
+  selectedDetailsGraphic.textFont(font);
+  selectedDetailsGraphic.fill(255);
+  selectedDetailsGraphic.textSize(selectedDetailsGraphic.width * 0.02);
+  selectedDetailsGraphic.text("TYPE:  " + selectedArt.type + "\nSURFACE:  " + selectedArt.surface, selectedDetailsGraphic.width * 0.6, selectedDetailsGraphic.height * 0.45);
 
   image(selectedDetailsGraphic, window.width * 0.6, 0);
 }
 
 function drawFilter() {
-  filterGraphic.background(200);
+  filterGraphic.background(42);
 
+  filterGraphic.textFont(font);
+  filterGraphic.fill(255);
+  filterGraphic.textSize(filterGraphic.width * 0.02);
   filterGraphic.text("TYPE", filterGraphic.width * 0.05, filterGraphic.height * 0.075);
   filterGraphic.text("SURFACE", filterGraphic.width * 0.55, filterGraphic.height * 0.075);
 
+  noStroke();
   for (let i = 0; i < 4; i++) {
-    if (typeFilter[i]) filterGraphic.fill(255);
-    else filterGraphic.fill(150);
-    filterGraphic.rect(filterGraphic.width * 0.05, filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
-    filterGraphic.fill(0);
-    filterGraphic.text(typeFilterNames[i], filterGraphic.width * 0.065, filterGraphic.height * 0.05 * (4.15 + 4 * i))
+    if (typeFilter[i]) filterGraphic.fill(43, 120, 192);
+    else filterGraphic.fill(110);
+    filterGraphic.rect(filterGraphic.width * 0.05, filterGraphic.height * 0.04   * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
+    filterGraphic.fill(255);
+    filterGraphic.text(typeFilterNames[i], filterGraphic.width * 0.065, filterGraphic.height * 0.04 * (4.5 + 4 * i))
   }
 
   for (let i = 0; i < 4; i++) {
-    if (surfaceFilter[i]) filterGraphic.fill(255);
-    else filterGraphic.fill(150);
-    filterGraphic.rect(filterGraphic.width * 0.55, filterGraphic.height * 0.05 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
-    filterGraphic.fill(0);
-    filterGraphic.text(surfaceFilterNames[i], filterGraphic.width * 0.565, filterGraphic.height * 0.05 * (4.15 + 4 * i))
+    if (surfaceFilter[i]) filterGraphic.fill(43, 120, 192);
+    else filterGraphic.fill(110);
+    filterGraphic.rect(filterGraphic.width * 0.55, filterGraphic.height * 0.04 * (3 + 4 * i), filterGraphic.width * 0.4, filterGraphic.height * 0.1);
+    filterGraphic.fill(255);
+    filterGraphic.text(surfaceFilterNames[i], filterGraphic.width * 0.565, filterGraphic.height * 0.04 * (4.5 + 4 * i))
   }
 
+  filterGraphic.fill(138, 113, 165);
+  filterGraphic.rect(filterGraphic.width * 0.05, filterGraphic.height * 0.84, filterGraphic.width * 0.9, filterGraphic.height * 0.1);
+  filterGraphic.fill(255);
+  filterGraphic.text("See Student Opinions", filterGraphic.width * 0.38, filterGraphic.height * 0.9);
 
   image(filterGraphic, window.width * 0.6, window.height * 0.5);
 }
